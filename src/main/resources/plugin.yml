@@ -1,0 +1,15 @@
+name: Tpa
+version: '0.0.1'
+main: dev.only0nehpleft.tpa.Tpa
+api-version: '1.21'
+description: Made by Only0neHpLeft
+commands:
+  tpa:
+    description: Requests and teleportation to another player..
+    usage: /tpa <option>
+    permission: teleportation.tpa
+
+permissions:
+  teleportation.tpa:
+    description: Allows the player to use the /tpa <option> CMD.
+    default: op
