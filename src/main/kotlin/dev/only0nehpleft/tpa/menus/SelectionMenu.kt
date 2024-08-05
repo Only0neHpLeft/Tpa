@@ -1,5 +1,6 @@
 package dev.only0nehpleft.tpa.menus
 
+import dev.only0nehpleft.tpa.managers.EffectManager
 import dev.only0nehpleft.tpa.managers.RequestManager
 import dev.only0nehpleft.tpa.menus.SelectionSlots.Companion.acceptItem
 import dev.only0nehpleft.tpa.menus.SelectionSlots.Companion.paneItem
@@ -14,7 +15,8 @@ import org.bukkit.plugin.java.JavaPlugin
 
 class SelectionMenu(
     private val plugin: JavaPlugin,
-    private val requestManager: RequestManager
+    private val requestManager: RequestManager,
+    private val effectManager: EffectManager
 ) : Listener {
 
     private val guiName = "Confirm Request"
@@ -61,25 +63,28 @@ class SelectionMenu(
         when (event.slot) {
             rejectSlot -> {
                 val requestId = requestMap[player] ?: return
-                val requesterName = requestManager.getReceivedRequests(player).find { it.first == requestId }?.second?.second ?: return
-                requestManager.removeRequest(requestId)
                 requestMap.remove(player)
+                requestManager.removeRequest(requestId)
+                val requesterName = requestManager.getSentRequests(player).find { it.first == requestId }?.second?.second
+                val requester = requesterName?.let { Bukkit.getPlayer(it) }
                 player.sendMessage("§cSuccessfully rejected the offer.")
-                Bukkit.getPlayer(requesterName)?.sendMessage("§b${player.name} §7has §crejected §7your teleport request.")
+                requester?.sendMessage("§b${player.name} §7has §crejected §7your teleport request.")
                 player.closeInventory()
             }
             acceptSlot -> {
                 val requestId = requestMap[player] ?: return
-                val requesterName = requestManager.getReceivedRequests(player).find { it.first == requestId }?.second?.second ?: return
-                val requester = Bukkit.getPlayer(requesterName)
+                requestMap.remove(player)
+                val requestDetails = requestManager.getReceivedRequests(player).find { it.first == requestId }?.second
+                val requesterName = requestDetails?.second
+                val requester = requesterName?.let { Bukkit.getPlayer(it) }
                 if (requester != null) {
                     player.teleport(requester.location)
                     player.sendMessage("§aSuccessfully teleported to §b${requester.name}§a.")
                     requester.sendMessage("§b${player.name} §7has §aaccepted §7your teleport request.")
+                    effectManager.playTeleportEffects(requester)
                     requestManager.removeRequest(requestId)
-                    requestMap.remove(player)
-                    player.closeInventory()
                 }
+                player.closeInventory()
             }
         }
     }

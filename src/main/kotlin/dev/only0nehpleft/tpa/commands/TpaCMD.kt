@@ -1,6 +1,7 @@
 package dev.only0nehpleft.tpa.commands
 
 import dev.only0nehpleft.tpa.managers.RequestManager
+import dev.only0nehpleft.tpa.menus.EffectMenu
 import dev.only0nehpleft.tpa.menus.RequestMenu
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
@@ -19,6 +20,7 @@ class TpaCMD(
     private val plugin: JavaPlugin,
     private val requestManager: RequestManager,
     private val requestMenu: RequestMenu,
+    private val effectMenu: EffectMenu
 ) : CommandExecutor, TabCompleter {
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
@@ -33,13 +35,17 @@ class TpaCMD(
         }
 
         if (args.isEmpty()) {
-            sender.sendMessage("§aUsage: /tpa <player> or /tpa requests")
+            sender.sendMessage("§aUsage: /tpa <player>, /tpa requests, or /tpa effects")
             return true
         }
 
         when (args[0].lowercase()) {
             "requests" -> {
                 requestMenu.openRequestMenu(sender)
+                return true
+            }
+            "effects" -> {
+                effectMenu.openEffectsMenu(sender)
                 return true
             }
             else -> {
@@ -82,7 +88,7 @@ class TpaCMD(
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): List<String> {
         if (args.size == 1) {
             val onlinePlayers = Bukkit.getOnlinePlayers().map { it.name }
-            val suggestions = listOf("requests") + onlinePlayers
+            val suggestions = listOf("requests", "effects") + onlinePlayers
             return suggestions.filter { StringUtil.startsWithIgnoreCase(it, args[0]) }
         }
         return emptyList()

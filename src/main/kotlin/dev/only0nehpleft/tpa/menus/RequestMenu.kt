@@ -7,6 +7,7 @@ import dev.only0nehpleft.tpa.menus.RequestSlots.Companion.effectsItem
 import dev.only0nehpleft.tpa.menus.RequestSlots.Companion.refreshItem
 import dev.only0nehpleft.tpa.menus.SelectionSlots.Companion.paneItem
 import org.bukkit.Bukkit
+import org.bukkit.command.Command
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -86,7 +87,7 @@ class RequestMenu(
                 openRequestMenu(player)
             }
             effectsSlot -> {
-
+                player.performCommand("tpa effects")
             }
             in requestSlots -> {
                 val requestIndex = requestSlots.indexOf(event.slot)
