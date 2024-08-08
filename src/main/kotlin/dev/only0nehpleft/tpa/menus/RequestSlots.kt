@@ -88,10 +88,11 @@ class RequestSlots {
             Material.ENDER_PEARL,
             "§bEffects",
             listOf(
+                "",
                 "&#008DFFC&#2088FEu&#3F84FEs&#5F7FFDt&#7E7AFDo&#9E75FCm&#BD71FBi&#DD6CFBz&#FC67FAe §7your teleportation",
                 "§7experience with various §5effects.",
                 "",
-                "§c§lCOMING SOON"
+                "§eClick to view!"
             )
         )
     }

@@ -2,13 +2,10 @@ package dev.only0nehpleft.tpa.menus
 
 import dev.only0nehpleft.tpa.handlers.Utils
 import dev.only0nehpleft.tpa.managers.EffectType
-import dev.only0nehpleft.tpa.menus.SelectionSlots.Companion
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.FireworkMeta
-import org.bukkit.inventory.meta.SkullMeta
-import kotlin.math.ceil
 
 class EffectSlots {
 

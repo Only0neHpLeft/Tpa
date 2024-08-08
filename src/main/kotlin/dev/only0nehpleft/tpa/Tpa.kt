@@ -1,8 +1,9 @@
 package dev.only0nehpleft.tpa
 
+import PersistenceManager
 import dev.only0nehpleft.tpa.commands.TpaCMD
 import dev.only0nehpleft.tpa.listener.PlayerJoinListener
-import dev.only0nehpleft.tpa.managers.EffectManager
+import dev.only0nehpleft.tpa.managers.Effects
 import dev.only0nehpleft.tpa.managers.RequestManager
 import dev.only0nehpleft.tpa.menus.EffectMenu
 import dev.only0nehpleft.tpa.menus.RequestMenu
@@ -14,15 +15,20 @@ class Tpa : JavaPlugin() {
     private lateinit var selectionMenu: SelectionMenu
     private lateinit var requestMenu: RequestMenu
     private lateinit var requestManager: RequestManager
-    private lateinit var effectManager: EffectManager
+    private lateinit var effects: Effects
     private lateinit var effectMenu: EffectMenu
+    private lateinit var persistenceManager: PersistenceManager
 
     override fun onEnable() {
         requestManager = RequestManager(this)
-        effectManager = EffectManager(this)
-        selectionMenu = SelectionMenu(this, requestManager, effectManager)
+        persistenceManager = PersistenceManager(this)
+        effects = Effects(this, persistenceManager)
+
+        persistenceManager.loadEffects(effects)
+
+        selectionMenu = SelectionMenu(this, requestManager, effects)
         requestMenu = RequestMenu(this, requestManager, selectionMenu)
-        effectMenu = EffectMenu(this, effectManager)
+        effectMenu = EffectMenu(this, effects)
 
         registerListeners()
         registerCommands()
@@ -30,6 +36,7 @@ class Tpa : JavaPlugin() {
     }
 
     override fun onDisable() {
+        persistenceManager.saveEffects(effects)
         requestManager.clearAllRequests()
     }
 
@@ -48,6 +55,6 @@ class Tpa : JavaPlugin() {
     }
 
     private fun registerListeners() {
-        server.pluginManager.registerEvents(PlayerJoinListener(this, effectManager), this)
+        server.pluginManager.registerEvents(PlayerJoinListener(this, effects), this)
     }
 }

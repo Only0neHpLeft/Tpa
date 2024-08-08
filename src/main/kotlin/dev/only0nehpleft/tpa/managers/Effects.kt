@@ -1,37 +1,41 @@
 package dev.only0nehpleft.tpa.managers
 
+import PersistenceManager
 import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.*
 
-class EffectManager(
-    private val plugin: JavaPlugin
+class Effects(
+    private val plugin: JavaPlugin,
+    private val persistenceManager: PersistenceManager
 ) {
 
-    private val defaultEffects: Set<EffectType> = setOf(EffectType.PORTAL)
-    val playerEffects: MutableMap<Player, Set<EffectType>> = mutableMapOf()
+    private val defaultEffect: EffectType = EffectType.PORTAL
+    val playerEffects: MutableMap<UUID, EffectType> = mutableMapOf()
 
-    fun setPlayerEffects(player: Player, effects: Set<EffectType>) {
-        playerEffects[player] = effects
+    init {
+        persistenceManager.loadEffects(this)
     }
 
-    fun setDefaultEffect(player: Player) {
-        if (!playerEffects.containsKey(player)) {
-            playerEffects[player] = defaultEffects
-        }
+    fun setPlayerEffect(player: Player, effect: EffectType) {
+        playerEffects[player.uniqueId] = effect
+        persistenceManager.saveEffects(this)
     }
 
-    fun playTeleportEffects(player: Player) {
-        val effects = playerEffects[player] ?: return
-        effects.forEach { effectType ->
-            when (effectType) {
-                EffectType.PORTAL -> playPortalEffect(player)
-                EffectType.LIGHTNING -> playLightningEffect(player)
-                EffectType.SPARK -> playSparkEffect(player)
-                EffectType.FIREWORK -> playFireworkEffect(player)
-                EffectType.SMOKE -> playSmokeEffect(player)
-            }
+    fun getDefaultEffect(player: Player): EffectType {
+        return playerEffects.getOrDefault(player.uniqueId, defaultEffect)
+    }
+
+    fun playTeleportEffect(player: Player) {
+        val effectType = playerEffects[player.uniqueId] ?: return
+        when (effectType) {
+            EffectType.PORTAL -> playPortalEffect(player)
+            EffectType.LIGHTNING -> playLightningEffect(player)
+            EffectType.SPARK -> playSparkEffect(player)
+            EffectType.FIREWORK -> playFireworkEffect(player)
+            EffectType.SMOKE -> playSmokeEffect(player)
         }
     }
 

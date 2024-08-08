@@ -1,6 +1,6 @@
 package dev.only0nehpleft.tpa.menus
 
-import dev.only0nehpleft.tpa.managers.EffectManager
+import dev.only0nehpleft.tpa.managers.Effects
 import dev.only0nehpleft.tpa.managers.EffectType
 import dev.only0nehpleft.tpa.menus.EffectSlots.Companion.closeItem
 import dev.only0nehpleft.tpa.menus.EffectSlots.Companion.goBackItem
@@ -14,7 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin
 
 class EffectMenu(
     private val plugin: JavaPlugin,
-    private val effectManager: EffectManager,
+    private val effects: Effects,
 ) : Listener {
 
     private val guiName = "Tpa Effects"
@@ -51,9 +51,8 @@ class EffectMenu(
         }
 
         effectSlots.forEach { (slot, effectType) ->
-            val enabled = effectManager.playerEffects[player]?.contains(effectType) == true
-            val item = EffectSlots.createEffectItem(player, effectType, enabled)
-            inventory.setItem(slot, item)
+            val enabled = effects.playerEffects[player.uniqueId] == effectType
+            inventory.setItem(slot, EffectSlots.createEffectItem(player, effectType, enabled))
         }
 
         player.openInventory(inventory)
@@ -68,7 +67,6 @@ class EffectMenu(
         }
 
         event.isCancelled = true
-        val effects = effectManager.playerEffects[player]?.toMutableSet() ?: mutableSetOf()
 
         when (event.slot) {
             closeSlot -> {
@@ -80,14 +78,10 @@ class EffectMenu(
             }
 
             else -> {
-                val effectType = effectSlots[event.slot] ?: return
-                if (effects.contains(effectType)) {
-                    effects.remove(effectType)
-                } else {
-                    effects.add(effectType)
+                effectSlots[event.slot]?.let { effectType ->
+                    effects.setPlayerEffect(player, effectType)
+                    openEffectsMenu(player)
                 }
-                effectManager.setPlayerEffects(player, effects)
-                openEffectsMenu(player)
             }
         }
     }

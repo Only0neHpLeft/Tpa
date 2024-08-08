@@ -1,6 +1,5 @@
 package dev.only0nehpleft.tpa.managers
 
-import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -11,30 +10,58 @@ import java.io.IOException
 class RequestManager(private val plugin: JavaPlugin) {
 
     private val requestFile: File = File(plugin.dataFolder, "requests.yml")
+    private val playersFile: File = File(plugin.dataFolder, "players.yml")
     private val requestConfig: FileConfiguration = YamlConfiguration.loadConfiguration(requestFile)
+    private val playersConfig: FileConfiguration = YamlConfiguration.loadConfiguration(playersFile)
 
     init {
-        try {
-            if (!plugin.dataFolder.exists()) {
-                plugin.dataFolder.mkdirs()
-            }
+        if (!plugin.dataFolder.exists()) {
+            plugin.dataFolder.mkdirs()
+        }
 
-            if (!requestFile.exists()) {
-                requestFile.createNewFile()
-                saveDefaultRequestConfig()
-            }
-        } catch (e: IOException) {
-            plugin.logger.severe("Failed to create or access requests.yml: ${e.message}")
+        ensureFileExists(requestFile) {
+            requestConfig.createSection("requests")
+            saveConfig(requestConfig, requestFile)
+        }
+
+        ensureFileExists(playersFile) {
+            playersConfig.createSection("players")
+            savePlayersConfig()
         }
     }
 
-    private fun saveDefaultRequestConfig() {
-        requestConfig.set("requests", null)
-        try {
-            requestConfig.save(requestFile)
-        } catch (e: IOException) {
-            plugin.logger.severe("Failed to save default requests.yml: ${e.message}")
+    private fun ensureFileExists(file: File, init: () -> Unit) {
+        if (!file.exists()) {
+            try {
+                file.createNewFile()
+                init()
+            } catch (e: IOException) {
+                plugin.logger.severe("Failed to create or access ${file.name}: ${e.message}")
+            }
         }
+    }
+
+    private fun savePlayersConfig() {
+        saveConfig(playersConfig, playersFile)
+    }
+
+    private fun saveConfig(config: FileConfiguration, file: File) {
+        try {
+            config.save(file)
+        } catch (e: IOException) {
+            plugin.logger.severe("Failed to save ${file.name}: ${e.message}")
+        }
+    }
+
+    fun toggleAcceptingRequests(player: Player): Boolean {
+        val currentState = isAcceptingRequests(player)
+        playersConfig.set("players.${player.uniqueId}.accepting_requests", !currentState)
+        savePlayersConfig()
+        return !currentState
+    }
+
+    fun isAcceptingRequests(player: Player): Boolean {
+        return playersConfig.getBoolean("players.${player.uniqueId}.accepting_requests", true)
     }
 
     fun storeRequest(uniqueId: String, targetPlayer: Player, requester: Player) {

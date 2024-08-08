@@ -35,7 +35,7 @@ class TpaCMD(
         }
 
         if (args.isEmpty()) {
-            sender.sendMessage("§aUsage: /tpa <player>, /tpa requests, or /tpa effects")
+            sender.sendMessage("§aUsage: /tpa <player|requests|effects|toggle>")
             return true
         }
 
@@ -48,6 +48,11 @@ class TpaCMD(
                 effectMenu.openEffectsMenu(sender)
                 return true
             }
+            "toggle" -> {
+                val newStatus = requestManager.toggleAcceptingRequests(sender)
+                sender.sendMessage("§bTeleport Requests §7are now ${if (newStatus) "§aenabled" else "§cdisabled"}.")
+                return true
+            }
             else -> {
                 val targetPlayer = Bukkit.getPlayer(args[0])
                 if (targetPlayer == null) {
@@ -57,6 +62,11 @@ class TpaCMD(
 
                 if (targetPlayer == sender) {
                     sender.sendMessage("§cYou cannot send a teleport request to yourself.")
+                    return true
+                }
+
+                if (!requestManager.isAcceptingRequests(targetPlayer)) {
+                    sender.sendMessage("§b${targetPlayer.name} §7is not accepting teleport requests.")
                     return true
                 }
 
@@ -88,7 +98,7 @@ class TpaCMD(
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): List<String> {
         if (args.size == 1) {
             val onlinePlayers = Bukkit.getOnlinePlayers().map { it.name }
-            val suggestions = listOf("requests", "effects") + onlinePlayers
+            val suggestions = listOf("requests", "effects", "toggle") + onlinePlayers
             return suggestions.filter { StringUtil.startsWithIgnoreCase(it, args[0]) }
         }
         return emptyList()

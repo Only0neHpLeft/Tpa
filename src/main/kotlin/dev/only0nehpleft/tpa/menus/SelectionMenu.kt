@@ -1,6 +1,6 @@
 package dev.only0nehpleft.tpa.menus
 
-import dev.only0nehpleft.tpa.managers.EffectManager
+import dev.only0nehpleft.tpa.managers.Effects
 import dev.only0nehpleft.tpa.managers.RequestManager
 import dev.only0nehpleft.tpa.menus.SelectionSlots.Companion.acceptItem
 import dev.only0nehpleft.tpa.menus.SelectionSlots.Companion.paneItem
@@ -16,7 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin
 class SelectionMenu(
     private val plugin: JavaPlugin,
     private val requestManager: RequestManager,
-    private val effectManager: EffectManager
+    private val effects: Effects
 ) : Listener {
 
     private val guiName = "Confirm Request"
@@ -81,7 +81,7 @@ class SelectionMenu(
                     player.teleport(requester.location)
                     player.sendMessage("§aSuccessfully teleported to §b${requester.name}§a.")
                     requester.sendMessage("§b${player.name} §7has §aaccepted §7your teleport request.")
-                    effectManager.playTeleportEffects(requester)
+                    effects.playTeleportEffect(requester)
                     requestManager.removeRequest(requestId)
                 }
                 player.closeInventory()

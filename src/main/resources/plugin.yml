@@ -1,5 +1,5 @@
 name: Tpa
-version: '0.0.2'
+version: ${version}
 main: dev.only0nehpleft.tpa.Tpa
 api-version: '1.21'
 description: Made by Only0neHpLeft

@@ -7,7 +7,6 @@ import dev.only0nehpleft.tpa.menus.RequestSlots.Companion.effectsItem
 import dev.only0nehpleft.tpa.menus.RequestSlots.Companion.refreshItem
 import dev.only0nehpleft.tpa.menus.SelectionSlots.Companion.paneItem
 import org.bukkit.Bukkit
-import org.bukkit.command.Command
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -54,15 +53,17 @@ class RequestMenu(
             inventory.setItem(slot, paneItem)
         }
 
-        val receivedRequests = requestManager.getReceivedRequests(player)
+        if (requestManager.isAcceptingRequests(player)) {
+            val receivedRequests = requestManager.getReceivedRequests(player)
 
-        for ((index, slot) in requestSlots.withIndex()) {
-            val (_, request) = receivedRequests.getOrNull(index) ?: break
-            val (_, requesterName, requestTimeMillis) = request
-            val requester = Bukkit.getPlayer(requesterName)
-            if (requester != null) {
-                val item = createRequest(index + 1, requester, requestTimeMillis)
-                inventory.setItem(slot, item)
+            for ((index, slot) in requestSlots.withIndex()) {
+                val (_, request) = receivedRequests.getOrNull(index) ?: break
+                val (_, requesterName, requestTimeMillis) = request
+                val requester = Bukkit.getPlayer(requesterName)
+                if (requester != null) {
+                    val item = createRequest(index + 1, requester, requestTimeMillis)
+                    inventory.setItem(slot, item)
+                }
             }
         }
 

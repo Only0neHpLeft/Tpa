@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "dev.only0nehpleft"
-version = "0.0.2"
+version = "0.0.3"
 
 repositories {
     mavenCentral()
@@ -31,7 +31,7 @@ tasks.build {
 }
 
 tasks.processResources {
-    val props = mapOf("version" to version)
+    val props = mapOf("version" to project.version)
     inputs.properties(props)
     filteringCharset = "UTF-8"
     filesMatching("plugin.yml") {
