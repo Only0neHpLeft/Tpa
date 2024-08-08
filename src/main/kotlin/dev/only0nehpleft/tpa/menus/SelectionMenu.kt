@@ -67,7 +67,7 @@ class SelectionMenu(
                 requestManager.removeRequest(requestId)
                 val requesterName = requestManager.getSentRequests(player).find { it.first == requestId }?.second?.second
                 val requester = requesterName?.let { Bukkit.getPlayer(it) }
-                player.sendMessage("§cSuccessfully rejected the offer.")
+                player.sendMessage("§7You have §crejected §7the request from §b${requester?.name}.")
                 requester?.sendMessage("§b${player.name} §7has §crejected §7your teleport request.")
                 player.closeInventory()
             }
@@ -79,7 +79,7 @@ class SelectionMenu(
                 val requester = requesterName?.let { Bukkit.getPlayer(it) }
                 if (requester != null) {
                     player.teleport(requester.location)
-                    player.sendMessage("§aSuccessfully teleported to §b${requester.name}§a.")
+                    player.sendMessage("§7You have been §ateleported §7to §b${requester.name}§a.")
                     requester.sendMessage("§b${player.name} §7has §aaccepted §7your teleport request.")
                     effects.playTeleportEffect(requester)
                     requestManager.removeRequest(requestId)

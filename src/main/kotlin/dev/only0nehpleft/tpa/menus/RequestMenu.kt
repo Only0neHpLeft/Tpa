@@ -1,5 +1,6 @@
 package dev.only0nehpleft.tpa.menus
 
+import dev.only0nehpleft.tpa.managers.Effects
 import dev.only0nehpleft.tpa.managers.RequestManager
 import dev.only0nehpleft.tpa.menus.RequestSlots.Companion.closeItem
 import dev.only0nehpleft.tpa.menus.RequestSlots.Companion.createRequest
@@ -7,6 +8,7 @@ import dev.only0nehpleft.tpa.menus.RequestSlots.Companion.effectsItem
 import dev.only0nehpleft.tpa.menus.RequestSlots.Companion.refreshItem
 import dev.only0nehpleft.tpa.menus.SelectionSlots.Companion.paneItem
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -16,7 +18,8 @@ import org.bukkit.plugin.java.JavaPlugin
 class RequestMenu(
     private val plugin: JavaPlugin,
     private val requestManager: RequestManager,
-    private val selectionMenu: SelectionMenu
+    private val selectionMenu: SelectionMenu,
+    private val effects: Effects
 ) : Listener {
 
     private val guiName = "Tpa Requests"
@@ -26,7 +29,7 @@ class RequestMenu(
     private val closeSlot = 49
     private val effectsSlot = 53
 
-    private val requestSlots = listOf(
+    val requestSlots = listOf(
         10, 11, 12, 13, 14, 15, 16,
         19, 20, 21, 22, 23, 24, 25,
         28, 29, 30, 31, 32, 33, 34,
@@ -79,6 +82,9 @@ class RequestMenu(
         }
 
         event.isCancelled = true
+        if (event.currentItem == null || event.currentItem?.type == Material.AIR) {
+            return
+        }
 
         when (event.slot) {
             closeSlot -> {
@@ -92,11 +98,35 @@ class RequestMenu(
             }
             in requestSlots -> {
                 val requestIndex = requestSlots.indexOf(event.slot)
-                val requestId = requestManager.getReceivedRequests(player).getOrNull(requestIndex)?.first ?: return
-                val requesterName = requestManager.getReceivedRequests(player).find { it.first == requestId }?.second?.second ?: return
-                val requester = Bukkit.getPlayer(requesterName)
-                if (requester != null) {
-                    selectionMenu.openMenu(player, requester, requestId)
+                val request = requestManager.getReceivedRequests(player).getOrNull(requestIndex) ?: return
+                val requestId = request.first
+
+                if (event.isShiftClick) {
+                    if (event.isLeftClick) {
+                        requestManager.removeRequest(requestId)
+                        val requesterName = request.second.second
+                        val requester = Bukkit.getPlayer(requesterName)
+                        player.sendMessage("§7You have §crejected §7the request from §b${requester?.name}.")
+                        requester?.sendMessage("§b${player.name} §7has §crejected §7your teleport request.")
+                    } else if (event.isRightClick) {
+                        val requesterName = request.second.second
+                        val requester = Bukkit.getPlayer(requesterName)
+                        if (requester != null) {
+                            player.teleport(requester)
+                            player.sendMessage("§7You have been §ateleported §7to §b${requester.name}§a.")
+                            requester.sendMessage("§b${player.name} §7has §aaccepted §7your teleport request.")
+                            effects.playTeleportEffect(requester)
+                        }
+                        requestManager.removeRequest(requestId)
+                    }
+                    openRequestMenu(player)
+                    player.closeInventory()
+                } else {
+                    val requesterName = request.second.second
+                    val requester = Bukkit.getPlayer(requesterName)
+                    if (requester != null) {
+                        selectionMenu.openMenu(player, requester, requestId)
+                    }
                 }
             }
         }

@@ -27,7 +27,7 @@ class Tpa : JavaPlugin() {
         persistenceManager.loadEffects(effects)
 
         selectionMenu = SelectionMenu(this, requestManager, effects)
-        requestMenu = RequestMenu(this, requestManager, selectionMenu)
+        requestMenu = RequestMenu(this, requestManager, selectionMenu, effects)
         effectMenu = EffectMenu(this, effects)
 
         registerListeners()

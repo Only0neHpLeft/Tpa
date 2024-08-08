@@ -59,7 +59,11 @@ class RequestSlots {
                 "§7Requester: §e${requester.name}",
                 "",
                 "§7World: $worldName",
-                "§7Time: $timeSinceRequest"
+                "§7Time: $timeSinceRequest",
+                "",
+                "§d§lSHIFT+CLICK §7-> §cFast Reject",
+                "§d§lSHIFT+RIGHT_CLICK §7-> §aFast Accept"
+
             )
 
             return createCustomHead(requester, "§bRequest #$requestPosition", lore)

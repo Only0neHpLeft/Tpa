@@ -60,6 +60,12 @@ class TpaCMD(
                     return true
                 }
 
+                val receivedRequests = requestManager.getReceivedRequests(targetPlayer)
+                if (receivedRequests.size >= requestMenu.requestSlots.size) {
+                    sender.sendMessage("§b${targetPlayer.name} §7has all request slots full.")
+                    return true
+                }
+
                 if (targetPlayer == sender) {
                     sender.sendMessage("§cYou cannot send a teleport request to yourself.")
                     return true
